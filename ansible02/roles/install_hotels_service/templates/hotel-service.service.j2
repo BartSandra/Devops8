@@ -1,0 +1,17 @@
+[Unit]
+Description=Hotel Service
+
+[Service]
+WorkingDirectory=/opt/hotel-service/hotel-service
+Environment=POSTGRES_HOST=192.168.56.22
+Environment=POSTGRES_PORT=5432
+Environment=POSTGRES_DB=hotels_db
+Environment=POSTGRES_USER=postgres
+Environment=POSTGRES_PASSWORD=postgres
+ExecStart=/usr/bin/java -jar /opt/hotel-service/hotel-service/target/hotel-service-0.0.1-SNAPSHOT.jar
+SuccessExitStatus=143
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+

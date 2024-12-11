@@ -1,0 +1,93 @@
+services:
+  postgres:
+    image: sandra1997bo/postgres:13-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: users_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: sandra1997bo/rabbitmq:3.8-management-alpine
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  session-service:
+    image: sandra1997bo/session-service:latest
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+
+  hotel-service:
+    image: sandra1997bo/hotel-service:latest
+    ports:
+      - "8082:8082"
+    depends_on:
+      - postgres
+
+  payment-service:
+    image: sandra1997bo/payment-service:latest
+    ports:
+      - "8084:8084"
+    depends_on:
+      - postgres
+
+  loyalty-service:
+    image: sandra1997bo/loyalty-service:latest
+    ports:
+      - "8085:8085"
+    depends_on:
+      - postgres
+
+  report-service:
+    image: sandra1997bo/report-service:latest
+    ports:
+      - "8086:8086"
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  booking-service:
+    image: sandra1997bo/booking-service:latest
+    ports:
+      - "8083:8083"
+    depends_on:
+      - postgres
+      - rabbitmq
+      - hotel-service
+      - payment-service
+      - loyalty-service
+
+  gateway-service:
+    image: sandra1997bo/gateway-service:latest
+    ports:
+      - "8087:8087"
+    depends_on:
+      - session-service
+      - hotel-service
+      - booking-service
+      - payment-service
+      - loyalty-service
+      - report-service
+
+        # nginx:
+        # image: sandra1997bo/my-nginxnew:latest
+        # ports:
+        # - "80:80"
+        # depends_on:
+        # - gateway-service
+        # - session-service
+
+volumes:
+  postgres-data:
+  rabbitmq-data:
+
